@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Learning Hub - แอปเรียนวิทยาศาสตร์</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .student-list, .group-display, .lesson-content {
+            margin-top: 20px;
+        }
+
+        .student-item, .group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .score-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .group-item {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .group-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .group-members {
+            font-size: 14px;
+        }
+
+        .lesson-card {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .lesson-card:hover {
+            transform: scale(1.02);
+        }
+
+        .lesson-detail {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .lesson-detail.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #bee5eb;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 20px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Science Learning Hub</h1>
+            <p>แอปพลิเคชันการเรียนวิทยาศาสตร์แบบครบครัน</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('classrooms')">🏫 ห้องเรียน</div>
+            <div class="nav-tab" onclick="showTab('students')">👥 จัดการนักเรียน</div>
+            <div class="nav-tab" onclick="showTab('scores')">📊 คะแนน</div>
+            <div class="nav-tab" onclick="showTab('groups')">🎲 สุ่มกลุ่ม</div>
+            <div class="nav-tab" onclick="showTab('lessons')">📚 บทเรียน</div>
+        </div>
+
+        <!-- Tab ห้องเรียน -->
+        <div id="classrooms" class="tab-content active">
+            <h2>🏫 จัดการห้องเรียน</h2>
+            <div class="input-group">
+                <label for="classroomName">ชื่อห้องเรียน:</label>
+                <input type="text" id="classroomName" placeholder="เช่น ม.1/1, ม.2/3, วิทย์ 1">
+            </div>
+            <div class="input-group">
+                <label for="classroomGrade">ระดับชั้น:</label>
+                <select id="classroomGrade">
+                    <option value="">เลือกระดับชั้น</option>
+                    <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                    <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                    <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                    <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                    <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                    <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                </select>
+            </div>
+            <button class="btn" onclick="addClassroom()">เพิ่มห้องเรียน</button>
+            <button class="btn btn-danger" onclick="clearAllClassrooms()">ลบทั้งหมด</button>
+            
+            <div class="student-list" id="classroomList">
+                <!-- รายชื่อห้องเรียนจะแสดงที่นี่ -->
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalClassrooms">0</div>
+                    <div>ห้องเรียนทั้งหมด</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAllStudents">0</div>
+                    <div>นักเรียนทั้งหมด</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab นักเรียน -->
+        <div id="students" class="tab-content">
+            <h2>👥 จัดการรายชื่อนักเรียน</h2>
+            
+            <div class="input-group">
+                <label for="selectedClassroom">เลือกห้องเรียน:</label>
+                <select id="selectedClassroom">
+                    <option value="">เลือกห้องเรียน</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="studentName">ชื่อนักเรียน:</label>
+                <input type="text" id="studentName" placeholder="กรอกชื่อนักเรียน">
+            </div>
+            <button class="btn" onclick="addStudent()">เพิ่มนักเรียน</button>
+            <button class="btn btn-danger" onclick="clearStudentsInClass()">ลบนักเรียนในห้องนี้</button>
+            
+            <div class="student-list" id="studentList">
+                <!-- รายชื่อนักเรียนจะแสดงที่นี่ -->
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="currentClassStudents">0</div>
+                    <div>นักเรียนในห้องปัจจุบัน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab คะแนน -->
+        <div id="scores" class="tab-content">
+            <h2>📊 จัดการคะแนน</h2>
+            
+            <div class="input-group">
+                <label for="examClassroom">เลือกห้องเรียน:</label>
+                <select id="examClassroom">
+                    <option value="">เลือกห้องเรียน</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="examName">ชื่อการสอบ:</label>
+                <input type="text" id="examName" placeholder="กรอกชื่อการสอบ">
+            </div>
+            <button class="btn" onclick="createExam()">สร้างการสอบใหม่</button>
+            
+            <div id="scoreSection">
+                <!-- ส่วนคะแนนจะแสดงที่นี่ -->
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="avgScore">0</div>
+                    <div>คะแนนเฉลี่ย</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="highScore">0</div>
+                    <div>คะแนนสูงสุด</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab สุ่มกลุ่म -->
+        <div id="groups" class="tab-content">
+            <h2>🎲 สุ่มกลุ่มนักเรียน</h2>
+            <div class="input-group">
+                <label for="groupSize">จำนวนคนต่อกลุ่ม:</label>
+                <input type="number" id="groupSize" value="4" min="2" max="10">
+            </div>
+            <button class="btn" onclick="randomizeGroups()">สุ่มกลุ่ม</button>
+            
+            <div class="group-display" id="groupDisplay">
+                <!-- กลุ่มที่สุ่มจะแสดงที่นี่ -->
+            </div>
+        </div>
+
+        <!-- Tab บทเรียน -->
+        <div id="lessons" class="tab-content">
+            <h2>📚 บทเรียนวิทยาศาสตร์</h2>
+            
+            <div class="lesson-card" onclick="toggleLesson('physics')">
+                <h3>🔬 ฟิสิกส์พื้นฐาน</h3>
+                <p>เรียนรู้หลักการพื้นฐานของฟิสิกส์</p>
+                <div class="lesson-detail" id="physics">
+                    <h4>เนื้อหาบทเรียน:</h4>
+                    <ul>
+                        <li><strong>แรงและการเคลื่อนที่</strong> - กฎการเคลื่อนที่ของนิวตัน</li>
+                        <li><strong>พลังงาน</strong> - พลังงานจลน์และพลังงานศักย์</li>
+                        <li><strong>คลื่นและเสียง</strong> - คุณสมบัติของคลื่น</li>
+                        <li><strong>แสงและการมองเห็น</strong> - การหักเหของแสง</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <p>ความคืบหน้า: 65%</p>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson('chemistry')">
+                <h3>⚗️ เคมีพื้นฐาน</h3>
+                <p>สำรวจโลกของอะตอมและโมเลกุล</p>
+                <div class="lesson-detail" id="chemistry">
+                    <h4>เนื้อหาบทเรียน:</h4>
+                    <ul>
+                        <li><strong>โครงสร้างอะตอม</strong> - อิเล็กตรอน โปรตอน นิวตรอน</li>
+                        <li><strong>ตารางธาตุ</strong> - การจัดกลุ่มธาตุเคมี</li>
+                        <li><strong>พันธะเคมี</strong> - พันธะไอออนิกและโควาเลนต์</li>
+                        <li><strong>ปฏิกิริยาเคมี</strong> - การเขียนสมการเคมี</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                    <p>ความคืบหน้า: 45%</p>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson('biology')">
+                <h3>🧬 ชีววิทยาพื้นฐาน</h3>
+                <p>ศึกษาสิ่งมีชีวิตและระบบต่างๆ</p>
+                <div class="lesson-detail" id="biology">
+                    <h4>เนื้อหาบทเรียน:</h4>
+                    <ul>
+                        <li><strong>เซลล์</strong> - หน่วยพื้นฐานของสิ่งมีชีวิต</li>
+                        <li><strong>DNA และพันธุกรรม</strong> - การถ่ายทอดลักษณะ</li>
+                        <li><strong>ระบบหายใจ</strong> - การแลกเปลี่ยนแก๊ส</li>
+                        <li><strong>ระบบย่อยอาหาร</strong> - การดูดซึมสารอาหาร</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <p>ความคืบหน้า: 30%</p>
+                </div>
+            </div>
+
+            <div class="lesson-card" onclick="toggleLesson('earth')">
+                <h3>🌍 วิทยาศาสตร์โลกและอวกาศ</h3>
+                <p>เรียนรู้เกี่ยวกับโลกและจักรวาล</p>
+                <div class="lesson-detail" id="earth">
+                    <h4>เนื้อหาบทเรียน:</h4>
+                    <ul>
+                        <li><strong>โครงสร้างโลก</strong> - เปลือกโลก แมนเทิล แกนโลก</li>
+                        <li><strong>สภาพอากาศ</strong> - การเกิดฝนและลม</li>
+                        <li><strong>ระบบสุริยะ</strong> - ดาวเคราะห์และดวงจันทร์</li>
+                        <li><strong>ดาราศาสตร์</strong> - ดวงดาวและกาแล็กซี่</li>
+                    </ul>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <p>ความคืบหน้า: 20%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลแอพ
+        let classrooms = [];
+        let students = [];
+        let exams = {};
+        let currentExam = null;
+        let currentClassroom = null;
+
+        // โหลดข้อมูลจาก Memory เมื่อเริ่มแอพ
+        function loadData() {
+            const savedClassrooms = localStorage.getItem('classrooms');
+            const savedStudents = localStorage.getItem('students');
+            const savedExams = localStorage.getItem('exams');
+            
+            if (savedClassrooms) {
+                classrooms = JSON.parse(savedClassrooms);
+                updateClassroomDisplay();
+                updateClassroomSelectors();
+            }
+            
+            if (savedStudents) {
+                students = JSON.parse(savedStudents);
+                updateStudentDisplay();
+            }
+            
+            if (savedExams) {
+                exams = JSON.parse(savedExams);
+            }
+        }
+
+        // บันทึกข้อมูล
+        function saveData() {
+            // ใช้ในหน่วยความจำแทน localStorage เนื่องจากไม่รองรับ
+            // localStorage.setItem('students', JSON.stringify(students));
+            // localStorage.setItem('exams', JSON.stringify(exams));
+        }
+
+        // จัดการแท็บ
+        function showTab(tabName) {
+            // ซ่อนแท็บทั้งหมด
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // ลบคลาส active จากปุ่มแท็บทั้งหมด
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // แสดงแท็บที่เลือก
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // อัพเดทข้อมูลเมื่อเปลี่ยนแท็บ
+            if (tabName === 'students') {
+                updateStudentDisplay();
+            }
+        }
+
+        // จัดการห้องเรียน
+        function addClassroom() {
+            const nameInput = document.getElementById('classroomName');
+            const gradeSelect = document.getElementById('classroomGrade');
+            const name = nameInput.value.trim();
+            const grade = gradeSelect.value;
+            
+            if (name && grade && !classrooms.find(c => c.name === name)) {
+                classrooms.push({
+                    id: Date.now(),
+                    name: name,
+                    grade: grade,
+                    studentCount: 0
+                });
+                nameInput.value = '';
+                gradeSelect.value = '';
+                updateClassroomDisplay();
+                updateClassroomSelectors();
+                saveData();
+            } else if (classrooms.find(c => c.name === name)) {
+                alert('มีห้องเรียนชื่อนี้อยู่แล้ว');
+            } else if (!name || !grade) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            }
+        }
+
+        function removeClassroom(id) {
+            if (confirm('ต้องการลบห้องเรียนนี้หรือไม่? (นักเรียนในห้องจะถูกลบด้วย)')) {
+                classrooms = classrooms.filter(c => c.id !== id);
+                students = students.filter(s => s.classroomId !== id);
+                updateClassroomDisplay();
+                updateClassroomSelectors();
+                updateStudentDisplay();
+                saveData();
+            }
+        }
+
+        function clearAllClassrooms() {
+            if (confirm('ต้องการลบห้องเรียนทั้งหมดหรือไม่? (นักเรียนทั้งหมดจะถูกลบด้วย)')) {
+                classrooms = [];
+                students = [];
+                updateClassroomDisplay();
+                updateClassroomSelectors();
+                updateStudentDisplay();
+                saveData();
+            }
+        }
+
+        function updateClassroomDisplay() {
+            const list = document.getElementById('classroomList');
+            const totalElement = document.getElementById('totalClassrooms');
+            const totalStudentsElement = document.getElementById('totalAllStudents');
+            
+            list.innerHTML = '';
+            classrooms.forEach(classroom => {
+                const studentCount = students.filter(s => s.classroomId === classroom.id).length;
+                const div = document.createElement('div');
+                div.className = 'student-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${classroom.name}</strong> (${classroom.grade})
+                        <br><small>นักเรียน: ${studentCount} คน</small>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeClassroom(${classroom.id})">ลบ</button>
+                `;
+                list.appendChild(div);
+            });
+            
+            totalElement.textContent = classrooms.length;
+            totalStudentsElement.textContent = students.length;
+        }
+
+        function updateClassroomSelectors() {
+            const selectors = ['selectedClassroom', 'examClassroom', 'groupClassroom'];
+            
+            selectors.forEach(selectorId => {
+                const selector = document.getElementById(selectorId);
+                if (selector) {
+                    const currentValue = selector.value;
+                    selector.innerHTML = '<option value="">เลือกห้องเรียน</option>';
+                    
+                    classrooms.forEach(classroom => {
+                        const option = document.createElement('option');
+                        option.value = classroom.id;
+                        option.textContent = ${classroom.name} (${classroom.grade});
+                        selector.appendChild(option);
+                    });
+                    
+                    // คืนค่าที่เลือกไว้
+                    if (currentValue) {
+                        selector.value = currentValue;
+                    }
+                }
+            });
+        }
+
+        // จัดการนักเรียน
+        function addStudent() {
+            const nameInput = document.getElementById('studentName');
+            const classroomSelect = document.getElementById('selectedClassroom');
+            const name = nameInput.value.trim();
+            const classroomId = parseInt(classroomSelect.value);
+            
+            if (!classroomId) {
+                alert('กรุณาเลือกห้องเรียนก่อน');
+                return;
+            }
+            
+            const classroom = classrooms.find(c => c.id === classroomId);
+            
+            if (name && !students.find(s => s.name === name && s.classroomId === classroomId)) {
+                students.push({
+                    id: Date.now(),
+                    name: name,
+                    classroomId: classroomId,
+                    classroomName: classroom.name,
+                    scores: {}
+                });
+                nameInput.value = '';
+                updateStudentDisplay();
+                updateClassroomDisplay();
+                saveData();
+            } else if (students.find(s => s.name === name && s.classroomId === classroomId)) {
+                alert('มีนักเรียนชื่อนี้ในห้องเรียนนี้อยู่แล้ว');
+            }
+        }
+
+        function removeStudent(id) {
+            if (confirm('ต้องการลบนักเรียนคนนี้หรือไม่?')) {
+                students = students.filter(s => s.id !== id);
+                updateStudentDisplay();
+                updateClassroomDisplay();
+                saveData();
+            }
+        }
+
+        function clearStudentsInClass() {
+            const classroomId = parseInt(document.getElementById('selectedClassroom').value);
+            if (!classroomId) {
+                alert('กรุณาเลือกห้องเรียนก่อน');
+                return;
+            }
+            
+            if (confirm('ต้องการลบนักเรียนทั้งหมดในห้องนี้หรือไม่?')) {
+                students = students.filter(s => s.classroomId !== classroomId);
+                updateStudentDisplay();
+                updateClassroomDisplay();
+                saveData();
+            }
+        }
+
+        function updateStudentDisplay() {
+            const list = document.getElementById('studentList');
+            const currentClassElement = document.getElementById('currentClassStudents');
+            const classroomId = parseInt(document.getElementById('selectedClassroom').value);
+            
+            list.innerHTML = '';
+            
+            if (!classroomId) {
+                list.innerHTML = '<div class="alert alert-info">กรุณาเลือกห้องเรียนเพื่อดูรายชื่อนักเรียน</div>';
+                currentClassElement.textContent = '0';
+                return;
+            }
+            
+            const classroomStudents = students.filter(s => s.classroomId === classroomId);
+            
+            classroomStudents.forEach(student => {
+                const div = document.createElement('div');
+                div.className = 'student-item';
+                div.innerHTML = `
+                    <span>${student.name}</span>
+                    <button class="btn btn-danger" onclick="removeStudent(${student.id})">ลบ</button>
+                `;
+                list.appendChild(div);
+            });
+            
+            currentClassElement.textContent = classroomStudents.length;
+            
+            if (classroomStudents.length === 0) {
+                list.innerHTML = '<div class="alert alert-info">ยังไม่มีนักเรียนในห้องเรียนนี้</div>';
+            }
+        }
+
+        // จัดการคะแนน
+        function createExam() {
+            const examNameInput = document.getElementById('examName');
+            const classroomSelect = document.getElementById('examClassroom');
+            const examName = examNameInput.value.trim();
+            const classroomId = parseInt(classroomSelect.value);
+            
+            if (!classroomId) {
+                alert('กรุณาเลือกห้องเรียนก่อน');
+                return;
+            }
+            
+            const classroomStudents = students.filter(s => s.classroomId === classroomId);
+            
+            if (examName && classroomStudents.length > 0) {
+                currentExam = examName;
+                currentClassroom = classroomId;
+                examNameInput.value = '';
+                displayScoreSection();
+            } else if (classroomStudents.length === 0) {
+                alert('ไม่มีนักเรียนในห้องเรียนนี้');
+            }
+        }
+
+        function displayScoreSection() {
+            const section = document.getElementById('scoreSection');
+            const classroom = classrooms.find(c => c.id === currentClassroom);
+            const classroomStudents = students.filter(s => s.classroomId === currentClassroom);
+            
+            section.innerHTML = `
+                <div class="alert alert-info">
+                    การสอบ: <strong>${currentExam}</strong><br>
+                    ห้องเรียน: <strong>${classroom.name} (${classroom.grade})</strong>
+                </div>
+            `;
+            
+            classroomStudents.forEach(student => {
+                const div = document.createElement('div');
+                div.className = 'student-item';
+                div.innerHTML = `
+                    <span>${student.name}</span>
+                    <input type="number" class="score-input" placeholder="คะแนน" 
+                           onchange="updateScore(${student.id}, this.value)" min="0" max="100">
+                `;
+                section.appendChild(div);
+            });
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'btn';
+            saveBtn.textContent = 'บันทึกคะแนน';
+            saveBtn.onclick = saveScores;
+            section.appendChild(saveBtn);
+        }
+
+        function updateScore(studentId, score) {
+            const student = students.find(s => s.id === studentId);
+            if (student && currentExam) {
+                student.scores[currentExam] = parseFloat(score) || 0;
+            }
+        }
+
+        function saveScores() {
+            if (currentExam) {
+                exams[currentExam] = students.map(s => ({
+                    name: s.name,
+                    score: s.scores[currentExam] || 0
+                }));
+                
+                updateScoreStats();
+                saveData();
+                
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.textContent = 'บันทึกคะแนนเรียบร้อยแล้ว';
+                document.getElementById('scoreSection').insertBefore(alert, document.getElementById('scoreSection').firstChild);
+                
+                setTimeout(() => alert.remove(), 3000);
+            }
+        }
+
+        function updateScoreStats() {
+            if (currentExam && exams[currentExam]) {
+                const scores = exams[currentExam].map(s => s.score);
+                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                const high = Math.max(...scores);
+                
+                document.getElementById('avgScore').textContent = avg.toFixed(1);
+                document.getElementById('highScore').textContent = high;
+            }
+        }
+
+        // สุ่มกลุ่ม
+        function randomizeGroups() {
+            if (students.length < 2) {
+                alert('ต้องมีนักเรียนอย่างน้อย 2 คน');
+                return;
+            }
+            
+            const groupSize = parseInt(document.getElementById('groupSize').value);
+            const shuffled = [...students].sort(() => Math.random() - 0.5);
+            const groups = [];
+            
+            for (let i = 0; i < shuffled.length; i += groupSize) {
+                groups.push(shuffled.slice(i, i + groupSize));
+            }
+            
+            displayGroups(groups);
+        }
+
+        function displayGroups(groups) {
+            const display = document.getElementById('groupDisplay');
+            display.innerHTML = '';
+            
+            groups.forEach((group, index) => {
+                const div = document.createElement('div');
+                div.className = 'group-item';
+                div.innerHTML = `
+                    <div class="group-title">กลุ่มที่ ${index + 1}</div>
+                    <div class="group-members">${group.map(s => s.name).join(', ')}</div>
+                `;
+                display.appendChild(div);
+            });
+        }
+
+        // บทเรียน
+        function toggleLesson(lessonId) {
+            const lesson = document.getElementById(lessonId);
+            const allLessons = document.querySelectorAll('.lesson-detail');
+            
+            // ปิดบทเรียนอื่นๆ
+            allLessons.forEach(l => {
+                if (l.id !== lessonId) {
+                    l.classList.remove('active');
+                }
+            });
+            
+            // เปิด/ปิดบทเรียนที่เลือก
+            lesson.classList.toggle('active');
+        }
+
+        // เริ่มต้นแอพ
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // เพิ่ม Enter key support
+            document.getElementById('studentName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addStudent();
+                }
+            });
+            
+            document.getElementById('examName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createExam();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
